@@ -22,8 +22,8 @@
 #alert {
     width: 35%;
     min-height: 40%;
-    background: white;
-    border-radius: 0.25em;
+    background: #c1c1c1;
+    border: inset white;
     flex-direction: column;
     padding-bottom: 1em;
     font-size: 1.2em;
