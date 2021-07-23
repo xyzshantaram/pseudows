@@ -1,0 +1,249 @@
+@font-face {
+    font-family: 'Levi Windows';
+    src: url('Levi\ Windows.ttf');
+}
+
+body {
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    background-image: linear-gradient(cyan, rgb(89, 89, 255));
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    overflow: hidden;
+    font-size: 0.9rem;
+}
+
+* {
+    font-family: 'Levi Windows', monospace;
+}
+
+#app {
+    width: 100%;
+    height: 100%;
+}
+
+#menu {
+    position: absolute;
+    left: 2px;
+    display: none;
+    width: 18%;
+    height: 50%;
+    bottom: 5%;
+    background: #c1c1c1;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+}
+
+#menu-items {
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 0.1rem;
+    padding-left: 0.1rem;
+    padding-right: 0.2rem;
+}
+
+#menu-sidebar {
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    background: navy;
+    color: white;
+    font-weight: bold;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex;
+    align-items: center;
+    width: 20%;
+    padding-top: 1rem;
+    background-image: linear-gradient(blue, navy);
+}
+
+.menu-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    font-size: 0.8rem;
+}
+
+.menu-item:hover {
+    background: navy;
+    color: white;
+    cursor: pointer;
+}
+
+#switcher {
+    z-index: 1000;
+    position: fixed;
+    bottom: 0;
+    height: 4%;
+    width: 100%;
+    background: #c1c1c1;
+    display: flex;
+    align-items: center;
+    padding: 0.2rem;
+}
+
+#switcher button {
+    margin: 0.1rem;
+}
+
+button {
+    padding: 0.2rem;
+    box-sizing: border-box;
+    background: #c0c0c0;
+    box-shadow: inset -1px -1px #0a0a0a, inset 1px 1px #ffffff, inset -2px -2px #808080, inset 2px 2px #dfdfdf;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    cursor: pointer;
+    border: none;
+    user-select: none;
+}
+
+button:active {
+    border: 2px solid #303030;
+    box-shadow: none;
+}
+
+#switcher button.task-button {
+    box-shadow: none;
+    border: 2px solid #777777;
+    background: rgba(255, 255, 255, 0.4);
+}
+
+#switcher button.task-button:hover {
+    background: rgba(255, 255, 255, 0.6);
+}
+
+#switcher button.task-button.active {
+    border: 2px solid #303030;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.window-frame {
+    padding: 1rem;
+    background: #bbbbbb;
+    border-top: none;
+    box-sizing: border-box;
+}
+
+.window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    transition-duration: 0.1s;
+}
+
+.notepad {
+    border-radius: 0;
+    box-sizing: border-box;
+    resize: none;
+    font-family: monospace;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.notepad:focus {
+    outline: none;
+}
+
+.window.maximized {
+    width: 100%;
+    height: 95%;
+    box-shadow: none;
+    box-sizing: border-box;
+}
+
+.window-actions {
+    width: 100%;
+    height: 3ch;
+    padding-left: 0.2em;
+}
+
+.window-action-button {
+    cursor: pointer;
+    padding: 0.1rem;
+    padding-left: 0.2rem;
+    padding-right: 0.2rem;
+    margin: 0;
+}
+
+.window-action-button:not(:last-child) {
+    margin-right: 0.2rem;
+}
+
+.window-action-button:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+
+.window-titlebar {
+    height: 3ch;
+    background-image: linear-gradient(to right, navy, blue);
+    width: 100%;
+    display: flex;
+    box-shadow: inset -2px 0 0 #888888, inset 0 -2px 0 #888888, inset 2px 0 0 #888888, inset 0 2px 0 #888888;
+    justify-content: space-between;
+    align-content: space-between;
+    text-overflow: ellipsis;
+}
+
+.window-titlebar-name {
+    color: white;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding-left: 0.5em;
+    user-select: none;
+}
+
+.window-titlebar-buttons {
+    display: flex;
+    background: transparent;
+    user-select: none;
+}
+
+.window-titlebar-buttons button {
+    padding: 0.2rem;
+    flex-basis: 100%;
+    min-width: 3ch;
+}
+
+@keyframes minimize {
+    to {
+        transform: scale(0.7) translate(-50vw, 120vh);
+    }
+}
+
+@keyframes restore {
+    from {
+        transform: scale(0.7) translate(-50vw, 120vh);
+    }
+
+    to {
+        transform: scale(1) translate(0, 0);
+    }
+}
+
+@keyframes grow {
+    from {
+        transform: scale(0);
+    }
+
+    to {
+        transform: scale(1);
+    }
+}
+
+@keyframes die {
+    from {
+        transform: scale(1);
+    }
+
+    to {
+        transform: scale(0);
+    }
+}
