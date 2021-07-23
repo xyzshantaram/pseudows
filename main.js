@@ -205,6 +205,13 @@ class Window {
         }
     }
 
+    disableMaximize() {
+        const maximize = this.titleBarButtons.querySelector(':nth-child(2)');
+        maximize.setAttribute('disabled', 'disabled');
+        maximize.style.pointerEvents = 'none';
+        maximize.style.cursor = 'not-allowed';
+    }
+
     close() {
         document.querySelector("#switcher-buttons").removeChild(this.taskBtn);
         this.elem.style.animation = 'die 0.2s forwards';
@@ -300,21 +307,110 @@ class Terminal extends Window {
     generateContent() {
         let frame = document.createElement('div');
         frame.className = 'window-frame terminal-frame';
-        let actions = document.createElement('div');
-        actions.className = 'window-actions';
-        actions.style.background = '#c1c1c1';
-        frame.appendChild(actions);
-        let close = document.createElement('span');
-        close.className = 'window-action-button';
-        close.innerHTML = 'Close';
-        close.onclick = () => {
-            this.close();
-        }
+        let err = document.createTextNode('Pseudows cannot find ‘cmd’. Make sure you typed the name correctly, and then try again.');
+        frame.append(err);
         this.elem.append(frame);
     }
 }
 
 class Calculator extends Window {
+
+    constructor(width, height, args) {
+        super(width, height, args);
+        this.disableMaximize();
+    }
+
+    toggleMaximized() {}
+
+    generateContent() {
+        let frame = document.createElement('div');
+        frame.className = 'window-frame calculator-frame';
+        let field = document.createElement('input');
+        field.type = 'text';
+        field.className = 'calc-field';
+        let buttons = [1, 2, 3, '+', 4, 5, 6, '-', 7, 8, 9, '*', 'C', 0, '^', '/']
+        let container = document.createElement('div');
+        container.className = 'calc-items';
+        container.append(field)
+        for (let button of buttons) {
+            let btn = document.createElement('button');
+            btn.value = button;
+            btn.textContent = button;
+            btn.type = 'button';
+            if (button !== 'C') {
+                btn.onclick = function() {
+                    field.value += btn.value;
+                }
+            } else {
+                btn.onclick = () => field.value = '';
+            }
+            container.append(btn);
+        }
+        let equals = document.createElement('button');
+        equals.value = '=';
+        equals.textContent = '=';
+        equals.className = 'calc-equals';
+        equals.onclick = () => {
+            field.value = field.value.trim();
+            try {
+                if (field.value) field.value = evalArithmetic(field.value);
+            } catch (e) {
+                field.value = e;
+            }
+        }
+        container.append(equals);
+        frame.append(container);
+        this.elem.append(frame);
+    }
+}
+
+class InternetWanderer extends Window {
+    generateContent() {
+        let frame = document.createElement('div');
+        frame.className = 'window-frame ie-frame';
+        frame.style.cursor = 'progress';
+
+        frame.innerHTML = `
+            <h1><i class='fa fa-internet-explorer'></i></h1>
+            <h3>
+            <div> Welcome to Wanderer!</div>
+            <div> This is the first-time setup process. </div>
+            <div> Press Next to continue. </div>
+            </h3>
+        `
+        let btn = document.createElement('button');
+        btn.innerHTML = 'Next';
+
+        frame.appendChild(btn);
+
+        btn.onclick = () => {
+            setTimeout(() =>
+                createAlert('Error', 'An error occurred while the setup process was being started. Wanderer failed to start.', 'error', () => {
+                    hideAlert();
+                    this.close();
+                }, "OK"),
+                1000
+            );
+        }
+
+        this.elem.append(frame);
+    }
+}
+
+class Paint extends Window {
+    generateContent() {
+        let frame = document.createElement('div');
+        frame.className = 'window-frame paint-frame';
+
+        let iframe = document.createElement('iframe');
+        iframe.src = 'https://jspaint.app';
+
+        iframe.style.width = '100%';
+        iframe.style.height = '100%';
+
+        frame.append(iframe);
+        this.elem.append(frame);
+    }
 
 }
 
@@ -362,6 +458,38 @@ const APPS = {
         desktop: true,
         icon: '<i class="fas fa-file-alt"></i>'
     },
+    'Terminal': {
+        'obj': Terminal,
+        width: 500,
+        height: 300,
+        title: 'Terminal',
+        desktop: true,
+        icon: '<i class="fas fa-terminal"></i>'
+    },
+    'Calculator': {
+        'obj': Calculator,
+        width: 300,
+        height: 400,
+        title: 'Calculator',
+        desktop: true,
+        icon: '<i class="fas fa-calculator"></i>'
+    },
+    'Internet Wanderer': {
+        'obj': InternetWanderer,
+        width: 800,
+        height: 600,
+        title: 'Internet Wanderer',
+        desktop: true,
+        icon: '<i class="fa fa-internet-explorer" aria-hidden="true"></i>'
+    },
+    'Paint': {
+        'obj': Paint,
+        width: 800,
+        height: 600,
+        title: 'Paint',
+        desktop: true,
+        icon: '<i class="fas fa-palette"></i>'
+    },
     'About...': {
         'obj': About,
         width: 300,
@@ -370,14 +498,6 @@ const APPS = {
         desktop: true,
         icon: '<i class="fas fa-info-circle"></i>'
     },
-    'Terminal': {
-        'obj': Terminal,
-        width: 500,
-        height: 300,
-        title: 'Terminal',
-        desktop: true,
-        icon: '<i class="fas fa-terminal"></i>'
-    }
 }
 
 function createDesktopItem(icon, label) {

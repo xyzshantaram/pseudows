@@ -163,6 +163,57 @@ button:active {
     height: 100%;
 }
 
+.window-frame.calculator-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    height: 100%;
+}
+
+.ie-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    height: 100%;
+    justify-content: center;
+    background: #c1c1c1;
+}
+
+.paint-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    height: 100%;
+    justify-content: center;
+    background: #ffffff;
+}
+
+.calc-field {
+    padding-top: 0.5em;
+    padding-bottom: 0.5em;
+    font-size: 1.5em;
+    grid-column: span 4;
+    margin: 0 !important;
+}
+
+.calc-equals {
+    grid-column: span 4;
+}
+
+.calc-items {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 0.5rem;
+    padding: 10px;
+}
+
+.calc-items button {
+    font-size: 2rem;
+}
+
 .window {
     position: absolute;
     display: flex;
@@ -309,6 +360,7 @@ button:active {
     color: #dddddd;
     font-weight: bold;
     text-shadow: 1px 1px 0 #000000;
+    text-align: center;
 }
 
 @keyframes minimize {
