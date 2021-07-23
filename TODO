@@ -1,8 +1,8 @@
 TODO: add browser
 TODO: file system
-    TODO: add terminal
+    PARTIAL: add terminal
     TODO: file explorer
-TODO: add calculator
-TODO: add paint
+DONE: add calculator
+DONE: add paint
 TODO: CSS vars
 TODO: break up files
