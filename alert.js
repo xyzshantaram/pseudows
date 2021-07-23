@@ -1,3 +1,6 @@
+const ALERT_EMPTY_FIELD = 0;
+const ALERT_CANCELLED = 1;
+
 function alert_CreateElement(parent, tag, className, id, innerHTML, misc) {
     let elem = document.createElement(tag);
     if (className) elem.className = className;
@@ -67,7 +70,7 @@ function hideAlert() {
     }, 200);
 }
 
-function createPrompt(title, msg, callback, callbackLabel) {
+function createPrompt(title, msg, callback, callbackLabel, onErr) {
     const mask = document.getElementById('alert-mask');
     const alert = document.getElementById('alert');
     document.getElementById('alert-header').innerHTML = title; // set dialog title
@@ -94,21 +97,19 @@ function createPrompt(title, msg, callback, callbackLabel) {
 
     let action = document.getElementById('alert-action');
     action.style.display = 'block';
-    action.innerHTML = callbackLabel;
+    action.innerHTML = callbackLabel || 'Submit';
     action.onclick = function() {
         if (field.value) {
             callback(field.value);
             hideAlert();
         } else {
-            hideAlert();
-            throw new Error('cancelled');
+            if (onErr) onErr(ALERT_EMPTY_FIELD);
         }
     }
 
     let close = document.getElementById('alert-close');
     close.onclick = function() {
-        hideAlert();
-        throw new Error('cancelled');
+        if (onErr) onErr(ALERT_CANCELLED);
     }
 }
 

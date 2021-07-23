@@ -23,7 +23,7 @@
     width: 35%;
     min-height: 40%;
     background: white;
-    border-radius: 1em;
+    border-radius: 0.25em;
     flex-direction: column;
     padding-bottom: 1em;
     font-size: 1.2em;

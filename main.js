@@ -232,11 +232,11 @@ class About extends Window {
     }
 }
 
-function saveFile(blob) {
+function saveFile(blob, name) {
     let blobUrl = URL.createObjectURL(blob);
     var link = document.createElement("a");
     link.href = blobUrl;
-    link.download = "file.txt";
+    link.download = name || 'file.txt';
     link.click();
 }
 
@@ -251,11 +251,16 @@ class Notepad extends Window {
         let save = document.createElement('span');
         save.className = 'window-action-button';
         save.innerHTML = 'Save';
-        save.onclick = function() {
+        save.onclick = () => {
             let blob = new Blob([ta.value], {
                 type: "text/plain;charset=utf-8"
             });
-            saveFile(blob);
+            createPrompt('Save as', 'Enter a filename.', function(name) {
+                saveFile(blob, name);
+            }, 'Save', function(type) {
+                createAlert('Cancelled', type == ALERT_CANCELLED ? "Input cancelled." : "Empty filename.", 'info');
+            });
+
         }
 
         let close = document.createElement('span');
@@ -358,27 +363,6 @@ window.addEventListener('click', function(e) {
         hideMenu();
     }
 })
-
-// from https://codepen.io/wonism/pen/dXgAxE
-function debounce(cb, interval, immediate) {
-    var timeout;
-
-    return function() {
-        var context = this,
-            args = arguments;
-        var later = function() {
-            timeout = null;
-            if (!immediate) cb.apply(context, args);
-        };
-
-        var callNow = immediate && !timeout;
-
-        clearTimeout(timeout);
-        timeout = setTimeout(later, interval);
-
-        if (callNow) cb.apply(context, args);
-    };
-};
 
 function init() {
     app = new App();
