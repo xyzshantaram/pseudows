@@ -111,10 +111,10 @@ class Window {
         this.taskBtn.innerHTML = this.name;
 
         this.taskBtn.onmousedown = (e) => {
-            if (e.button === 2) {
+            if (e.button === 2) { // right
                 this.close();
             }
-            if (e.button === 0) {
+            if (e.button === 0) { // left
                 this.toggleMinimized();
             }
         }
@@ -225,7 +225,7 @@ class About extends Window {
         })
         elt.innerHTML = `
             <div><b>Pseudows by shantaram</b></div>
-            <div>version 0.0.1</div>
+            <div>version 0.4.1</div>
         `;
 
         this.elem.appendChild(elt);
@@ -260,7 +260,6 @@ class Notepad extends Window {
             }, 'Save', function(type) {
                 createAlert('Cancelled', type == ALERT_CANCELLED ? "Input cancelled." : "Empty filename.", 'info');
             });
-
         }
 
         let close = document.createElement('span');
@@ -327,6 +326,21 @@ function mouseMove(e) {
     }
 }
 
+const TYPES = {
+    'Notepad': {
+        obj: Notepad,
+        width: 400,
+        height: 300,
+        'title': 'Notepad'
+    },
+    'About...': {
+        'obj': About,
+        width: 300,
+        height: 200,
+        'title': 'About'
+    }
+}
+
 function populateMenu(types) {
     let list = document.querySelector("#menu-items");
     list.innerHTML = '';
@@ -345,21 +359,6 @@ function populateMenu(types) {
     }
 }
 
-const TYPES = {
-    'Notepad': {
-        obj: Notepad,
-        width: 400,
-        height: 300,
-        'title': 'Notepad'
-    },
-    'About...': {
-        'obj': About,
-        width: 300,
-        height: 200,
-        'title': 'About'
-    }
-}
-
 window.addEventListener('click', function(e) {
     let menu = document.querySelector("#menu");
     let openBtn = document.querySelector("#menu-open-btn");
@@ -374,9 +373,17 @@ function init() {
     window.addEventListener('mousemove', mouseMove);
     populateMenu(TYPES);
 
-    window.onresize = function() {
-        init();
+    let dateDiv = document.querySelector("#switcher-clock-date");
+    let timeDiv = document.querySelector("#switcher-clock-time");
+
+    function updateDate() {
+        let cur = new Date();
+        dateDiv.innerHTML = cur.toLocaleDateString();
+        timeDiv.innerHTML = cur.toLocaleTimeString();
+        setTimeout(updateDate, 1000);
     }
+
+    updateDate();
 }
 
 window.addEventListener('DOMContentLoaded', function() {

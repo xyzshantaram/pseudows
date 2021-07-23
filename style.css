@@ -212,6 +212,28 @@ button:active {
     min-width: 3ch;
 }
 
+#switcher-clock {
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid gray;
+    font-size: 0.8em;
+    padding-left: 0.4em;
+    padding-right: 0.4em;
+    align-items: center;
+    cursor: pointer;
+}
+
+#desktop {
+    display: grid;
+    position: absolute;
+    border: 2px solid black;
+    width: 90%;
+    left: 2%;
+    height: 90%;
+    top: 2%;
+}
+
 @keyframes minimize {
     to {
         transform: scale(0.7) translate(-50vw, 120vh);
