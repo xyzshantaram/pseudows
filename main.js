@@ -146,7 +146,7 @@ class Window {
         this.titleBarButtons.append(
             this.createTitleButton('━', () => this.toggleMinimized()),
             this.createTitleButton('⬒', () => this.toggleMaximized()),
-            this.createTitleButton('❌', () => this.close())
+            this.createTitleButton('✕', () => this.close())
         );
         this.titleBar.append(this.titleBarName, this.titleBarButtons);
         this.elem.appendChild(this.titleBar);
@@ -267,7 +267,11 @@ class Notepad extends Window {
         close.className = 'window-action-button';
         close.innerHTML = 'Close';
         close.onclick = () => {
-            this.close();
+            createConfirm('Confirm', 'Are you sure you want to exit?', () => {
+                this.close();
+            }, () => {
+                hideAlert()
+            }, "I'm sure");
         }
 
         actions.append(save, close);

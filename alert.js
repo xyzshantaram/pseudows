@@ -23,7 +23,7 @@ function initialiseAlert() {
     let alertF = alert_CreateElement(alert, 'div', '', 'alert-footer');
     let alertA = alert_CreateElement(alertF, 'button', '', 'alert-action', 'Action');
     let alertC = alert_CreateElement(alertF, 'button', '', 'alert-close', 'Close');
-    document.getElementById('alert-close').onclick = hideAlert();
+    alertC.onclick = hideAlert();
 }
 
 function createAlert(title, body, mode, callback, callbackLabel) {
@@ -33,8 +33,15 @@ function createAlert(title, body, mode, callback, callbackLabel) {
     mask.style.display = 'flex';
     mask.style.animation = '0.2s fade-out reverse';
     alert.style.animation = '0.2s ease-in pop';
-    let close = document.getElementById('alert-close');
     // close button is only hidden in case of an error dialog, so we set this to block by default
+
+    document.getElementById('alert-header').innerHTML = title || "Alert"; // set dialog title
+    document.getElementById('alert-body').innerHTML = body; // set dialog body
+
+    let footer = document.getElementById('alert-footer');
+    footer.innerHTML = '';
+    let action = alert_CreateElement(footer, 'button', '', 'alert-action', 'Action');
+    let close = alert_CreateElement(footer, 'button', '', 'alert-close', 'Close');
 
     close.style.display = 'block';
     if (mode === 'error') {
@@ -48,7 +55,6 @@ function createAlert(title, body, mode, callback, callbackLabel) {
         close.onclick = hideAlert;
     }
 
-    let action = document.getElementById('alert-action');
     if (callback) { // if callback exists, enable the button for it and set the click action
         action.style.display = 'block';
         action.innerHTML = callbackLabel;
@@ -58,9 +64,6 @@ function createAlert(title, body, mode, callback, callbackLabel) {
     } else {
         action.style.display = 'none';
     }
-
-    document.getElementById('alert-header').innerHTML = title; // set dialog title
-    document.getElementById('alert-body').innerHTML = body; // set dialog body
 }
 
 function hideAlert() {
@@ -73,12 +76,16 @@ function hideAlert() {
 function createPrompt(title, msg, callback, callbackLabel, onErr) {
     const mask = document.getElementById('alert-mask');
     const alert = document.getElementById('alert');
-    document.getElementById('alert-header').innerHTML = title; // set dialog title
     const body = document.getElementById('alert-body');
     const wrapper = document.createElement('div');
     wrapper.className = 'v-flex-centered';
+    document.getElementById('alert-header').innerHTML = title || "Input"; // set dialog title
 
     body.innerHTML = '';
+    let footer = document.getElementById('alert-footer');
+    footer.innerHTML = '';
+    let action = alert_CreateElement(footer, 'button', '', 'alert-action', 'Action');
+    let close = alert_CreateElement(footer, 'button', '', 'alert-close', 'Close');
 
     // setting mask's display to flex makes every child visible
     mask.style.display = 'flex';
@@ -95,7 +102,6 @@ function createPrompt(title, msg, callback, callbackLabel, onErr) {
     wrapper.appendChild(field);
     body.appendChild(wrapper);
 
-    let action = document.getElementById('alert-action');
     action.style.display = 'block';
     action.innerHTML = callbackLabel || 'Submit';
     action.onclick = function() {
@@ -104,13 +110,46 @@ function createPrompt(title, msg, callback, callbackLabel, onErr) {
             hideAlert();
         } else {
             if (onErr) onErr(ALERT_EMPTY_FIELD);
+            else hideAlert();
         }
     }
 
-    let close = document.getElementById('alert-close');
     close.onclick = function() {
         if (onErr) onErr(ALERT_CANCELLED);
+        else hideAlert();
     }
+}
+
+function createConfirm(title, msg, yes, no, yesLabel, noLabel) {
+    const mask = document.getElementById('alert-mask');
+    const alert = document.getElementById('alert');
+    document.getElementById('alert-header').innerHTML = title; // set dialog title
+    const body = document.getElementById('alert-body');
+    document.getElementById('alert-header').innerHTML = title || "Confirm"; // set dialog title
+    body.innerHTML = '';
+
+    // setting mask's display to flex makes every child visible
+    mask.style.display = 'flex';
+    mask.style.animation = '0.2s fade-out reverse';
+    alert.style.animation = '0.2s ease-in pop';
+
+    body.innerHTML = msg || 'Are you sure?';
+
+    let yesBtn = document.createElement('button');
+    yesBtn.innerHTML = yesLabel || "Yes";
+    yesBtn.onclick = () => {
+        if (yes) yes();
+        hideAlert();
+    }
+    let noBtn = document.createElement('button');
+    noBtn.innerHTML = noLabel || "No";
+    noBtn.onclick = () => {
+        if (no) no();
+        hideAlert();
+    }
+    let footer = document.getElementById('alert-footer');
+    footer.innerHTML = '';
+    footer.append(yesBtn, noBtn);
 }
 
 window.addEventListener('DOMContentLoaded', function() {
