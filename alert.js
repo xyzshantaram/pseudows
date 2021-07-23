@@ -13,7 +13,7 @@ function alert_CreateElement(parent, tag, className, id, innerHTML, misc) {
 }
 
 function initialiseAlert() {
-    let mask = alert_CreateElement(document.body, 'div', 'v-flex-centered', 'mask');
+    let mask = alert_CreateElement(document.body, 'div', 'v-flex-centered', 'alert-mask');
     let alert = alert_CreateElement(mask, 'div', 'v-flex-centered', 'alert');
     let alertH = alert_CreateElement(alert, 'div', '', 'alert-header');
     let alertB = alert_CreateElement(alert, 'div', '', 'alert-body');
@@ -24,7 +24,7 @@ function initialiseAlert() {
 }
 
 function createAlert(title, body, mode, callback, callbackLabel) {
-    const mask = document.getElementById('mask');
+    const mask = document.getElementById('alert-mask');
     const alert = document.getElementById('alert');
     // setting mask's display to flex makes every child visible
     mask.style.display = 'flex';
@@ -61,10 +61,55 @@ function createAlert(title, body, mode, callback, callbackLabel) {
 }
 
 function hideAlert() {
-    document.getElementById('mask').style.animation = '0.19s fade-out forwards';
+    document.getElementById('alert-mask').style.animation = '0.19s fade-out forwards';
     setTimeout(() => {
-        document.getElementById('mask').style.display = 'none';
+        document.getElementById('alert-mask').style.display = 'none';
     }, 200);
+}
+
+function createPrompt(title, msg, callback, callbackLabel) {
+    const mask = document.getElementById('alert-mask');
+    const alert = document.getElementById('alert');
+    document.getElementById('alert-header').innerHTML = title; // set dialog title
+    const body = document.getElementById('alert-body');
+    const wrapper = document.createElement('div');
+    wrapper.className = 'v-flex-centered';
+
+    body.innerHTML = '';
+
+    // setting mask's display to flex makes every child visible
+    mask.style.display = 'flex';
+    mask.style.animation = '0.2s fade-out reverse';
+    alert.style.animation = '0.2s ease-in pop';
+
+    let txt = document.createTextNode(msg);
+
+    wrapper.appendChild(txt);
+
+    let field = document.createElement('input');
+    field.type = 'text';
+
+    wrapper.appendChild(field);
+    body.appendChild(wrapper);
+
+    let action = document.getElementById('alert-action');
+    action.style.display = 'block';
+    action.innerHTML = callbackLabel;
+    action.onclick = function() {
+        if (field.value) {
+            callback(field.value);
+            hideAlert();
+        } else {
+            hideAlert();
+            throw new Error('cancelled');
+        }
+    }
+
+    let close = document.getElementById('alert-close');
+    close.onclick = function() {
+        hideAlert();
+        throw new Error('cancelled');
+    }
 }
 
 window.addEventListener('DOMContentLoaded', function() {

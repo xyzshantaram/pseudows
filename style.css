@@ -21,6 +21,7 @@ body {
 #app {
     width: 100%;
     height: 100%;
+    z-index: 0;
 }
 
 #menu {
@@ -246,4 +247,11 @@ button:active {
     to {
         transform: scale(0);
     }
+}
+
+input[type='text'] {
+    background: white;
+    border: 2px inset gray;
+    margin-left: 1rem;
+    margin-right: 1rem;
 }
