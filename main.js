@@ -270,7 +270,7 @@ class Notepad extends Window {
                 this.close();
             }, () => {
                 hideAlert()
-            }, "I'm sure");
+            }, "I'm sure", "Cancel");
         }
 
         actions.append(save, close);
@@ -326,37 +326,76 @@ function mouseMove(e) {
     }
 }
 
-const TYPES = {
+const APPS = {
     'Notepad': {
         obj: Notepad,
         width: 400,
         height: 300,
-        'title': 'Notepad'
+        title: 'Notepad',
+        desktop: true,
+        icon: '<i class="fas fa-file-alt"></i>'
     },
     'About...': {
         'obj': About,
         width: 300,
         height: 200,
-        'title': 'About'
+        title: 'About',
+        desktop: true,
+        icon: '<i class="fas fa-info-circle"></i>'
     }
 }
 
-function populateMenu(types) {
-    let list = document.querySelector("#menu-items");
-    list.innerHTML = '';
-    for (let key in types) {
-        let elt = document.createElement('div');
-        elt.className = 'menu-item';
-        elt.innerHTML = key;
+function createDesktopItem(icon, label) {
+    return `
+        <div class='desktop-icon'>${icon}</div>
+        <span class='desktop-label'>${label}</span>
+    `;
+}
 
-        elt.onclick = function() {
+function populateItems(apps) {
+    let menuList = document.querySelector("#menu-items");
+    let desktop = document.querySelector("#desktop");
+    menuList.innerHTML = '';
+    for (let key in apps) {
+        const item = apps[key];
+        const elt = document.createElement('div');
+        elt.className = 'menu-item';
+
+        let icon = item.icon || '';
+
+        elt.innerHTML = `
+            ${icon}
+            <span>${key}</span>
+        `
+        const launch = () => {
             hideMenu();
-            app.addWindow(types[key].obj, types[key].width, types[key].height, {
-                name: types[key].title
-            })
+            app.addWindow(item.obj, item.width, item.height, {
+                name: item.title
+            });
         }
-        list.appendChild(elt);
+
+        elt.onclick = launch;
+
+        if (item.desktop) {
+            let ditm = document.createElement('div');
+            ditm.className = 'desktop-item';
+            ditm.innerHTML = createDesktopItem(item.icon, item.title);
+            ditm.ondblclick = launch;
+            ditm.onclick = function() {
+                document.querySelectorAll('.desktop-item.selected').forEach((elem) => elem.classList.remove('selected'));
+                this.classList.add('selected');
+            }
+            desktop.appendChild(ditm);
+        }
+        menuList.appendChild(elt);
     }
+}
+
+function matchesList(el, selectorList) {
+    for (let x of selectorList) {
+        if (el.matches(x)) return true;
+    }
+    return false;
 }
 
 window.addEventListener('click', function(e) {
@@ -365,13 +404,16 @@ window.addEventListener('click', function(e) {
     if (e.target !== menu && !menu.contains(e.target) && e.target !== openBtn) {
         hideMenu();
     }
+    if (!matchesList(e.target, ['.desktop-item', '.desktop-icon', '.desktop-item.selected', '.desktop-label', '.desktop-icon > i'])) {
+        document.querySelectorAll('.desktop-item.selected').forEach((elem) => elem.classList.remove('selected'));
+    }
 })
 
 function init() {
     app = new App();
     document.querySelector("#menu-open-btn").onclick = toggleMenu;
     window.addEventListener('mousemove', mouseMove);
-    populateMenu(TYPES);
+    populateItems(APPS);
 
     let dateDiv = document.querySelector("#switcher-clock-date");
     let timeDiv = document.querySelector("#switcher-clock-time");

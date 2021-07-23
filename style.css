@@ -7,7 +7,7 @@ body {
     height: 100vh;
     width: 100vw;
     margin: 0;
-    background-image: linear-gradient(cyan, rgb(89, 89, 255));
+    background-image: linear-gradient(rgb(12, 175, 175), rgb(89, 89, 255));
     background-repeat: no-repeat;
     background-size: 100% 100%;
     overflow: hidden;
@@ -66,6 +66,14 @@ body {
     font-size: 0.8rem;
 }
 
+.menu-item>.fas {
+    font-size: 1.5em;
+}
+
+.menu-item span {
+    margin-left: 0.5rem;
+}
+
 .menu-item:hover {
     background: navy;
     color: white;
@@ -81,7 +89,8 @@ body {
     background: #c1c1c1;
     display: flex;
     align-items: center;
-    padding: 0.2rem;
+    padding: 0.1rem;
+
 }
 
 #switcher button {
@@ -227,11 +236,53 @@ button:active {
 #desktop {
     display: grid;
     position: absolute;
-    border: 2px solid black;
-    width: 90%;
     left: 2%;
+    top: 3%;
+    grid-template-rows: repeat(auto-fit, 3em);
+    grid-auto-flow: column;
+    grid-auto-columns: 3em;
+    grid-gap: 2rem;
+    user-select: none;
     height: 90%;
-    top: 2%;
+}
+
+.desktop-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    height: 4em;
+    padding: 0.5em;
+    padding-left: 2em;
+    padding-right: 2em;
+    cursor: pointer;
+    text-overflow: ellipsis;
+}
+
+.desktop-item.selected {
+    background: rgba(0, 0, 128, 0.4);
+}
+
+.desktop-item:hover>.desktop-label {
+    color: #ffffff;
+}
+
+.desktop-item:hover:not(.selected) {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.desktop-item.selected:hover {
+    background: rgba(0, 0, 128, 0.2);
+}
+
+.desktop-icon {
+    font-size: 2em;
+}
+
+.desktop-label {
+    color: #dddddd;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #000000;
 }
 
 @keyframes minimize {
