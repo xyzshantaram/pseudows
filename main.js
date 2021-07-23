@@ -105,7 +105,7 @@ class Window {
     }
 
     createTaskButton() {
-        let switcher = document.querySelector('#switcher');
+        let switcher = document.querySelector('#switcher-buttons');
         this.taskBtn = document.createElement('button');
         this.taskBtn.className = 'task-button';
         this.taskBtn.innerHTML = this.name;
@@ -206,7 +206,7 @@ class Window {
     }
 
     close() {
-        document.querySelector("#switcher").removeChild(this.taskBtn);
+        document.querySelector("#switcher-buttons").removeChild(this.taskBtn);
         this.elem.style.animation = 'die 0.2s forwards';
         setTimeout(() => document.querySelector('#app').removeChild(this.elem), 210);
     }
@@ -225,6 +225,8 @@ class About extends Window {
         })
         elt.innerHTML = `
             <div><b>Pseudows by shantaram</b></div>
+            <div>This program is free, open-source software under the MIT License.</div>
+            <div>Copyright © 2021 Siddharth Singh</div>
             <div>version 0.4.1</div>
         `;
 
@@ -240,10 +242,21 @@ function saveFile(blob, name) {
     link.click();
 }
 
+class ValueError extends Error {}
+
+function evalArithmetic(string) {
+    if (/[^+\-*\/\^().0-9 ]/.test(string)) throw new ValueError("Non-arithmetic character detected");
+    while (/\^/.test(string)) {
+        string = string.replace('^', '**');
+        console.log(string)
+    }
+    return eval(string);
+}
+
 class Notepad extends Window {
     generateContent() {
         let elt = document.createElement('div');
-        elt.className = 'window-frame';
+        elt.className = 'window-frame notepad-frame';
         let actions = document.createElement('div');
         actions.className = 'window-actions';
         elt.appendChild(actions);
@@ -275,20 +288,34 @@ class Notepad extends Window {
 
         actions.append(save, close);
 
-        Object.assign(elt.style, {
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            height: '100%',
-            padding: '0'
-        })
-
         let ta = document.createElement('textarea');
         elt.appendChild(ta);
         ta.className = 'notepad';
 
         this.elem.appendChild(elt);
     }
+}
+
+class Terminal extends Window {
+    generateContent() {
+        let frame = document.createElement('div');
+        frame.className = 'window-frame terminal-frame';
+        let actions = document.createElement('div');
+        actions.className = 'window-actions';
+        actions.style.background = '#c1c1c1';
+        frame.appendChild(actions);
+        let close = document.createElement('span');
+        close.className = 'window-action-button';
+        close.innerHTML = 'Close';
+        close.onclick = () => {
+            this.close();
+        }
+        this.elem.append(frame);
+    }
+}
+
+class Calculator extends Window {
+
 }
 
 function randInt(min, max) {
@@ -342,6 +369,14 @@ const APPS = {
         title: 'About',
         desktop: true,
         icon: '<i class="fas fa-info-circle"></i>'
+    },
+    'Terminal': {
+        'obj': Terminal,
+        width: 500,
+        height: 300,
+        title: 'Terminal',
+        desktop: true,
+        icon: '<i class="fas fa-terminal"></i>'
     }
 }
 

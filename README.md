@@ -2,4 +2,5 @@
 
 A fake windows 98-inspired environment.
 
-Copyright © 2021 Siddharth Singh, subject to the terms of the MIT License
+This program is free, open-source software under the MIT License.  
+Copyright © 2021 Siddharth Singh
