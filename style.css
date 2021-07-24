@@ -81,6 +81,7 @@ body {
 }
 
 #switcher {
+    margin: 0;
     z-index: 1000;
     position: fixed;
     bottom: 0;
@@ -298,9 +299,10 @@ button:active {
 
 .window.maximized {
     width: 100%;
-    height: 95%;
+    height: 96%;
     box-shadow: none;
     box-sizing: border-box;
+    margin: 0;
 }
 
 .window-actions {

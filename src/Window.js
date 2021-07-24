@@ -45,7 +45,7 @@ class Window {
     update() {
         let styles = {
             width: this.maximized ? '100%' : this.width + 'px',
-            height: this.maximized ? '95%' : this.height + 'px',
+            height: this.maximized ? '96%' : this.height + 'px',
             left: this.maximized ? '0' : this.pos.x + 'px',
             top: this.maximized ? '0' : this.pos.y + 'px',
             zIndex: this.zIndex
@@ -56,7 +56,9 @@ class Window {
     createTitleButton(name, fn) {
         let btn = document.createElement('button');
         btn.innerHTML = name;
-        btn.onclick = fn;
+        btn.addEventListener('click', () => {
+            fn.call(this)
+        });
         return btn;
     }
 
