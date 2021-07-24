@@ -51,7 +51,6 @@ class Window {
             zIndex: this.zIndex
         }
         Object.assign(this.elem.style, styles);
-        this.titleBar.innerHTML = this.name;
     }
 
     createTitleButton(name, fn) {
@@ -95,24 +94,24 @@ class Window {
         }
 
         this.titleBarName = createElement({
-            parent: this.titleBar,
             misc: {
                 onmousedown: set,
                 onmouseup: rm
             },
             className: 'window-titlebar-name',
+            innerHTML: this.name,
+            parent: this.titleBar
         })
 
-        console.log(this.titleBar.children);
-
         this.titleBarButtons = createElement({
-            parent: this.titleBar,
+
             className: 'window-titlebar-buttons',
             children: [
                 this.createTitleButton('━', () => this.toggleMinimized()),
                 this.createTitleButton('⬒', () => this.toggleMaximized()),
                 this.createTitleButton('✕', () => this.close())
             ],
+            parent: this.titleBar
         })
     }
 
