@@ -350,7 +350,7 @@ button:active {
     grid-auto-columns: 3em;
     grid-gap: 2rem;
     user-select: none;
-    height: 90%;
+    height: 88%;
 }
 
 .desktop-item {
