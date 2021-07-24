@@ -185,6 +185,38 @@ button:active {
     height: 2rem;
 }
 
+.window-frame.mines-frame {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.mines-frame > .window-actions {
+    border-bottom: 2px solid slategray;
+}
+
+.mine-grid {
+    width: 100%;
+    height: 100%;
+    padding-bottom: 1em;
+}
+
+.mine-row {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.mine-tile {
+    width: 2em;
+    height: 2em;
+    padding: 0;
+    margin: 0.15em;
+}
+
 .window-actions > span {
     display: flex;
     justify-content: center;
@@ -284,6 +316,7 @@ button:active {
     padding-left: 0.2rem;
     padding-right: 0.2rem;
     margin: 0;
+    user-select: none;
 }
 
 .window-action-button:not(:last-child) {

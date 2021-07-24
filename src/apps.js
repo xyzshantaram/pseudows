@@ -24,6 +24,11 @@ const apps = {
         obj: Browser, width: 800, height: 600,
         desktop: true, icon: '<i class="fa fa-globe" aria-hidden="true"></i>'
     },
+    'Minesweeper': {
+        title: 'Mines',
+        obj: Minesweeper, width: 500, height: 500,
+        desktop: true, icon: '<i class="fas fa-bomb"></i>'
+    },
     'Paint': {
         title: 'Paint',
         obj: Paint, width: 800, height: 600,
@@ -32,6 +37,6 @@ const apps = {
     'About...': {
         title: 'About',
         obj: About, width: 300, height: 200,
-        desktop: true, icon: '<i class="fas fa-info-circle"></i>'
+        desktop: false, icon: '<i class="fas fa-info-circle"></i>'
     },
 }
