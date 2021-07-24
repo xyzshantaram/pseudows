@@ -11,7 +11,7 @@ class Notepad extends Window {
         createElement({ // close button
             parent: actions,
             type: 'span', className: 'window-action-button', innerHTML: 'Close',
-            misc: { onclick: this.close },
+            misc: { onclick: () => this.close() },
         })
     }
 

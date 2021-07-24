@@ -58,7 +58,7 @@ function createAlert(title, body, mode, callback, callbackLabel) {
     if (callback) { // if callback exists, enable the button for it and set the click action
         action.style.display = 'block';
         action.innerHTML = callbackLabel;
-        action.onclick = function() {
+        action.onclick = () => {
             callback();
         }
     } else {
@@ -104,7 +104,7 @@ function createPrompt(title, msg, callback, callbackLabel, onErr) {
 
     action.style.display = 'block';
     action.innerHTML = callbackLabel || 'Submit';
-    action.onclick = function() {
+    action.onclick = () => {
         if (field.value) {
             callback(field.value);
             hideAlert();
@@ -114,7 +114,7 @@ function createPrompt(title, msg, callback, callbackLabel, onErr) {
         }
     }
 
-    close.onclick = function() {
+    close.onclick = () => {
         if (onErr) onErr(ALERT_CANCELLED);
         else hideAlert();
     }
