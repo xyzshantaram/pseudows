@@ -1,6 +1,6 @@
 class InternetWanderer extends Window {
     generateContent() {
-        let frame = createElement({
+        this.frame = createElement({
             parent: this.elem,
             className: 'window-frame ie-frame',
             style: { cursor: 'progress' },
@@ -21,6 +21,7 @@ class InternetWanderer extends Window {
     }
 
     fail() {
+        this.frame.style.cursor = 'wait';
         setTimeout(() =>
             // title, msg...
             createAlert('Error', 'An error occurred while the setup process was being started. Wanderer failed to start.',
