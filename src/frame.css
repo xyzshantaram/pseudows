@@ -1,0 +1,19 @@
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background: #c1c1c1;
+    height: 100vh;
+    margin: 0;
+    font-family: 'Levi Windows', monospace;
+}
+
+@font-face {
+    font-family: 'Levi Windows';
+    src: url('/Levi\ Windows.ttf');
+}
+
+.hint {
+    color: #777777;
+}

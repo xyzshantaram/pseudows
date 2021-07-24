@@ -6,27 +6,32 @@ const apps = {
     },
     'Terminal': {
         title: 'Terminal',
-        'obj': Terminal, width: 500, height: 300,
+        obj: Terminal, width: 500, height: 300,
         desktop: true, icon: '<i class="fas fa-terminal"></i>'
     },
     'Calculator': {
         title: 'Calculator',
-        'obj': Calculator, width: 300, height: 400,
+        obj: Calculator, width: 300, height: 400,
         desktop: true, icon: '<i class="fas fa-calculator"></i>'
     },
     'Internet Wanderer': {
         title: 'Internet Wanderer',
-        'obj': InternetWanderer, width: 800, height: 600,
+        obj: InternetWanderer, width: 800, height: 600,
         desktop: true, icon: '<i class="fa fa-internet-explorer" aria-hidden="true"></i>'
+    },
+    'Browser': {
+        title: 'Browser',
+        obj: Browser, width: 800, height: 600,
+        desktop: true, icon: '<i class="fa fa-globe" aria-hidden="true"></i>'
     },
     'Paint': {
         title: 'Paint',
-        'obj': Paint, width: 800, height: 600,
+        obj: Paint, width: 800, height: 600,
         desktop: true, icon: '<i class="fas fa-palette"></i>'
     },
     'About...': {
         title: 'About',
-        'obj': About, width: 300, height: 200,
+        obj: About, width: 300, height: 200,
         desktop: true, icon: '<i class="fas fa-info-circle"></i>'
     },
 }
