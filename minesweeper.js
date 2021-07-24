@@ -156,7 +156,7 @@
         cell.state = CellStateEnum.OPEN;
 
         // flood-fill the board
-        if (!cell.isMine) {
+        if (!cell.isMine && cell.numAdjacentMines == 0) {
             this._floodFill(x + 1, y);
             this._floodFill(x - 1, y);
             this._floodFill(x, y + 1);
