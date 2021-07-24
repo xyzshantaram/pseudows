@@ -28,7 +28,7 @@ class Minesweeper extends Window {
 
     showAboutNotice() {
         createAlert('About',
-            `<h3>Mines v0.1</h3>
+            `<h3>Mines v1.0</h3>
             <div>Copyright © 2021 Siddharth Singh</div>
             <hr>
             <strong>Acknowledgements</strong>
@@ -114,7 +114,14 @@ class Minesweeper extends Window {
                 }
                 else {
                     if (cell.isMine) btn.innerHTML = '<i class="fa fa-bomb"></i>'
-                    else btn.innerHTML = cell.numAdjacentMines;
+                    else {
+                        Object.assign(btn.style, {
+                            boxShadow: 'none',
+                            border: '1px solid slategray',
+                            background: '#aaaaaa'
+                        })
+                        if (cell.numAdjacentMines) btn.innerHTML = cell.numAdjacentMines;
+                    }
                 }
 
                 btn.onmousedown = (e) => {
