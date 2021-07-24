@@ -152,6 +152,6 @@ function createConfirm(title, msg, yes, no, yesLabel, noLabel) {
     footer.append(yesBtn, noBtn);
 }
 
-window.addEventListener('DOMContentLoaded', function() {
+window.addEventListener('DOMContentLoaded', function () {
     initialiseAlert();
 });
