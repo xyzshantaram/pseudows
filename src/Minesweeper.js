@@ -67,7 +67,10 @@ class Minesweeper extends Window {
                 createAlert(
                     'Congratulations!',
                     'You won!', 'error',
-                    () => this.close(),
+                    () => {
+                        this.close();
+                        hideAlert();
+                    },
                     'Finish'
                 )
                 break;
