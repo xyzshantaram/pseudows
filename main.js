@@ -9,7 +9,7 @@ class App {
         y: null
     }
 
-    constructor() {}
+    constructor() { }
 
     nextZ() {
         return ++this.highestZ;
@@ -18,6 +18,24 @@ class App {
     addWindow(cls, width, height, args) {
         new cls(width, height, args);
     }
+}
+
+function createElement(args) {
+    let { parent, type, className, id, innerHTML, misc, children, style } = args;
+    if (!type) type = 'div';
+    let elem = document.createElement(type);
+    if (className) elem.className = className;
+    if (id) elem.id = id;
+    if (innerHTML) elem.innerHTML = innerHTML;
+    if (misc) Object.assign(elem, misc);
+    if (children) {
+        for (let child of children) {
+            elem.appendChild(child);
+        }
+    }
+    if (style) Object.assign(elem.style, style);
+    if (parent) parent.appendChild(elem);
+    return elem;
 }
 
 let app;
@@ -32,37 +50,30 @@ class Window {
 
     constructor(width, height, args) {
         this.zIndex = app.nextZ();
-        console.log(this.zIndex)
         this.width = width;
         this.height = height;
 
         this.lastDraw = {}
 
-        this.elem = document.createElement('div');
-        if (args.id) {
-            this.elem.id = args.id;
-        }
-        if (args.name) {
-            this.name = args.name;
-        } else {
-            throw new Error("No name provided for new window");
-        }
-        this.elem.className = 'window';
+        this.elem = createElement({
+            id: args.id,
+            className: 'window',
+            parent: document.querySelector("#app")
+        });
 
         this.pos = {
             x: (window.innerWidth / 2 - this.width / 2),
             y: (window.innerHeight / 2 - this.height / 2)
         }
 
+        this.name = args.name;
+
         this.createTitleBar();
         this.createTaskButton();
         this.generateContent();
-
-        document.querySelector("#app").appendChild(this.elem);
         this.update();
 
         this.elem.addEventListener('click', () => {
-            console.log(this.zIndex, app.highestZ)
             if (this.zIndex != app.highestZ) {
                 this.zIndex = app.nextZ();
                 this.update();
@@ -75,24 +86,11 @@ class Window {
 
     update() {
         let styles = {
+            width: this.maximized ? '100%' : this.width + 'px',
+            height: this.maximized ? '95%' : this.height + 'px',
+            left: this.maximized ? '0' : this.pos.x + 'px',
+            top: this.maximized ? '0' : this.pos.y + 'px',
             zIndex: this.zIndex
-        }
-
-        if (!this.maximized) {
-            styles = {
-                width: this.width + 'px',
-                height: this.height + 'px',
-                left: this.pos.x + 'px',
-                top: this.pos.y + 'px',
-                ...styles
-            }
-        } else {
-            styles = {
-                width: '100%',
-                height: '95%',
-                top: '0',
-                left: '0'
-            }
         }
         Object.assign(this.elem.style, styles);
     }
@@ -106,26 +104,29 @@ class Window {
 
     createTaskButton() {
         let switcher = document.querySelector('#switcher-buttons');
-        this.taskBtn = document.createElement('button');
-        this.taskBtn.className = 'task-button';
-        this.taskBtn.innerHTML = this.name;
-
+        this.taskBtn = createElement({
+            type: 'button',
+            className: 'task-button active',
+            innerHTML: this.name,
+            parent: switcher
+        })
         this.taskBtn.onmousedown = (e) => {
-            if (e.button === 2) { // right
-                this.close();
-            }
-            if (e.button === 0) { // left
-                this.toggleMinimized();
-            }
+            if (e.button === 2) this.close();
+            if (e.button === 0) this.toggleMinimized();
         }
+    }
 
-        switcher.appendChild(this.taskBtn);
-        this.taskBtn.classList.add('active');
+    bringToFront(update = true) {
+        if (this.zIndex != app.highestZ) this.zIndex = app.nextZ();
+        if (update) this.update();
     }
 
     createTitleBar() {
-        this.titleBar = document.createElement('div');
-        this.titleBar.className = 'window-titlebar';
+        this.titleBar = createElement({
+
+            className: 'window-titlebar',
+            parent: this.elem
+        })
 
         const set = () => {
             if (!this.maximized) app.draggedElement = this;
@@ -135,81 +136,64 @@ class Window {
             if (app.draggedElement === this) app.draggedElement = null;
         }
 
-        this.titleBarName = document.createElement('div');
-        this.titleBarName.onmousedown = set;
-        this.titleBarName.onmouseup = rm;
-        this.titleBarName.className = 'window-titlebar-name';
-        this.titleBarName.innerHTML = this.name;
+        this.titleBarName = createElement({
 
-        this.titleBarButtons = document.createElement('div');
-        this.titleBarButtons.className = 'window-titlebar-buttons';
-        this.titleBarButtons.append(
-            this.createTitleButton('━', () => this.toggleMinimized()),
-            this.createTitleButton('⬒', () => this.toggleMaximized()),
-            this.createTitleButton('✕', () => this.close())
-        );
-        this.titleBar.append(this.titleBarName, this.titleBarButtons);
-        this.elem.appendChild(this.titleBar);
+            misc: {
+                onmousedown: set,
+                onmouseup: rm
+            },
+            className: 'window-titlebar-name',
+            innerHTML: this.name,
+            parent: this.titleBar
+        })
+
+        this.titleBarButtons = createElement({
+
+            className: 'window-titlebar-buttons',
+            children: [
+                this.createTitleButton('━', () => this.toggleMinimized()),
+                this.createTitleButton('⬒', () => this.toggleMaximized()),
+                this.createTitleButton('✕', () => this.close())
+            ],
+            parent: this.titleBar
+        })
     }
 
-    generateContent() {}
+    generateContent() { }
 
     toggleMinimized() {
         this.minimized = !this.minimized;
-        if (this.minimized) {
-            this.elem.style.animation = 'minimize 0.4s forwards';
-            this.minimizedFrom = {
-                x: this.pos.x,
-                y: this.pos.y
-            }
-            this.taskBtn.classList.remove('active');
-        } else {
-            this.elem.style.animation = 'restore 0.4s forwards';
-            this.taskBtn.classList.add('active');
-        }
-        if (this.zIndex != app.highestZ) {
-            this.zIndex = app.nextZ();
-            this.update();
-        }
+        this.elem.style.animation = `${this.minimized ? 'minimize' : 'restore'} 0.4s forwards`;
+        this.taskBtn.classList[this.minimized ? 'remove' : 'add']('active');
     }
 
     toggleMaximized() {
-        if (!this.maximized) {
-            this.elem.classList.add('maximized');
-            this.preMaximizePos = {
-                x: this.pos.x,
-                y: this.pos.y
-            }
-            this.preMaximizeWidth = this.width;
-            this.preMaximizeHeight = this.height;
-
-            this.pos = {
-                x: 0,
-                y: 0
-            }
-        } else {
-            this.elem.classList.remove('maximized');
-            this.width = this.preMaximizeWidth;
-            this.height = this.preMaximizeHeight;
-
-            this.pos = {
-                x: this.preMaximizePos.x,
-                y: this.preMaximizePos.y
-            }
-        }
         this.maximized = !this.maximized;
-        this.update();
-        if (this.zIndex != app.highestZ) {
-            this.zIndex = app.nextZ();
-            this.update();
+        this.taskBtn.classList[this.maximized ? 'add' : 'remove']('maximized');
+        if (this.maximized) {
+            this.preMaximize = {
+                x: this.pos.x,
+                y: this.pos.y,
+                width: this.width,
+                height: this.height
+            }
+            this.pos.x = 0;
+            this.pos.y = 0;
+        } else {
+            const { width, height, x, y } = this.preMaximize;
+            Object.assign(this, { height, width, pos: { x, y } });
         }
+        this.bringToFront(false);
+        this.update();
     }
 
     disableMaximize() {
         const maximize = this.titleBarButtons.querySelector(':nth-child(2)');
         maximize.setAttribute('disabled', 'disabled');
-        maximize.style.pointerEvents = 'none';
-        maximize.style.cursor = 'not-allowed';
+        Object.assign(maximize.style, {
+            pointerEvents: 'none',
+            cursor: 'not-allowed'
+        });
     }
 
     close() {
@@ -221,201 +205,197 @@ class Window {
 
 class About extends Window {
     generateContent() {
-        let elt = document.createElement('div');
-        elt.className = 'window-frame';
-        Object.assign(elt.style, {
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100%'
-        })
-        elt.innerHTML = `
-            <div><b>Pseudows by shantaram</b></div>
+        let elt = createElement({
+
+            className: 'window-frame',
+            style: {
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                alignItems: 'center',
+                height: '100%'
+            },
+            innerHTML: `<div><b>Pseudows by shantaram</b></div>
             <div>This program is free, open-source software under the MIT License.</div>
             <div>Copyright © 2021 Siddharth Singh</div>
-            <div>version 0.4.1</div>
-        `;
-
-        this.elem.appendChild(elt);
+            <div>version 0.4.2</div>`,
+            parent: this.elem
+        })
     }
 }
 
 function saveFile(blob, name) {
-    let blobUrl = URL.createObjectURL(blob);
-    var link = document.createElement("a");
-    link.href = blobUrl;
-    link.download = name || 'file.txt';
+    let link = createElement({
+        type: 'a',
+        misc: {
+            href: URL.createObjectURL(blob),
+            download: name || 'file.txt'
+        }
+    })
     link.click();
 }
 
-class ValueError extends Error {}
-
 function evalArithmetic(string) {
-    if (/[^+\-*\/\^().0-9 ]/.test(string)) throw new ValueError("Non-arithmetic character detected");
+    if (/[^+\-*\/\^().0-9 ]/.test(string)) throw new Error("Non-arithmetic character detected");
     while (/\^/.test(string)) {
         string = string.replace('^', '**');
-        console.log(string)
     }
     return eval(string);
 }
 
 class Notepad extends Window {
     generateContent() {
-        let elt = document.createElement('div');
-        elt.className = 'window-frame notepad-frame';
-        let actions = document.createElement('div');
-        actions.className = 'window-actions';
-        elt.appendChild(actions);
+        let elt = createElement({ parent: this.elem, className: 'window-frame notepad-frame' });
+        let actions = createElement({ parent: elt, className: 'window-actions' });
+        let ta = createElement({ parent: elt, type: 'textarea', className: 'notepad' });
+        createElement({ // save button
+            parent: actions,
+            type: 'span', className: 'window-action-button', innerHTML: 'Save',
+            misc: { onclick: () => this.save(ta.value) },
+        })
+        createElement({ // close button
+            parent: actions,
+            type: 'span', className: 'window-action-button', innerHTML: 'Close',
+            misc: { onclick: this.close },
+        })
+    }
 
-        let save = document.createElement('span');
-        save.className = 'window-action-button';
-        save.innerHTML = 'Save';
-        save.onclick = () => {
-            let blob = new Blob([ta.value], {
-                type: "text/plain;charset=utf-8"
-            });
-            createPrompt('Save as', 'Enter a filename.', function(name) {
-                saveFile(blob, name);
-            }, 'Save', function(type) {
-                createAlert('Cancelled', type == ALERT_CANCELLED ? "Input cancelled." : "Empty filename.", 'info');
-            });
-        }
+    save(contents) {
+        let blob = new Blob([contents], { type: "text/plain;charset=utf-8" });
+        createPrompt('Save as', 'Enter a filename.', // Title, message
+            (name) => saveFile(blob, name), // Success callback
+            'Save', // Button alias
+            (type) => createAlert('Cancelled', // Error callback
+                type == ALERT_CANCELLED ? "Input cancelled." : "Empty filename.",
+                'info'
+            )
+        );
+    }
 
-        let close = document.createElement('span');
-        close.className = 'window-action-button';
-        close.innerHTML = 'Close';
-        close.onclick = () => {
-            createConfirm('Confirm', 'Are you sure you want to exit?', () => {
-                this.close();
-            }, () => {
-                hideAlert()
-            }, "I'm sure", "Cancel");
-        }
-
-        actions.append(save, close);
-
-        let ta = document.createElement('textarea');
-        elt.appendChild(ta);
-        ta.className = 'notepad';
-
-        this.elem.appendChild(elt);
+    close() {
+        createConfirm('Confirm', 'Are you sure you want to exit?',
+            () => super.close(), () => hideAlert(), // yes and no callbacks
+            "I'm sure", "Cancel" // Button aliases
+        );
     }
 }
 
 class Terminal extends Window {
     generateContent() {
-        let frame = document.createElement('div');
-        frame.className = 'window-frame terminal-frame';
-        let err = document.createTextNode('Pseudows cannot find ‘cmd’. Make sure you typed the name correctly, and then try again.');
-        frame.append(err);
-        this.elem.append(frame);
+        createElement({
+            parent: this.elem,
+            className: 'window-frame terminal-frame',
+            children: [
+                document.createTextNode('Pseudows cannot find ‘cmd’. Make sure you typed the name correctly, and then try again.')
+            ]
+        })
     }
 }
 
 class Calculator extends Window {
-
+    static BUTTONS = [1, 2, 3, '+', 4, 5, 6, '-', 7, 8, 9, '*', 'C', 0, '^', '/'];
     constructor(width, height, args) {
         super(width, height, args);
         this.disableMaximize();
     }
 
-    toggleMaximized() {}
+    toggleMaximized() { }
 
     generateContent() {
-        let frame = document.createElement('div');
-        frame.className = 'window-frame calculator-frame';
-        let field = document.createElement('input');
-        field.type = 'text';
-        field.className = 'calc-field';
-        let buttons = [1, 2, 3, '+', 4, 5, 6, '-', 7, 8, 9, '*', 'C', 0, '^', '/']
-        let container = document.createElement('div');
-        container.className = 'calc-items';
-        container.append(field)
-        for (let button of buttons) {
-            let btn = document.createElement('button');
-            btn.value = button;
-            btn.textContent = button;
-            btn.type = 'button';
-            if (button !== 'C') {
-                btn.onclick = function() {
-                    field.value += btn.value;
-                }
-            } else {
-                btn.onclick = () => field.value = '';
-            }
-            container.append(btn);
+        let frame = createElement({
+            className: 'window-frame calculator-frame',
+            parent: this.elem
+        })
+
+        this.field = createElement({
+            type: 'input', className: 'calc-field',
+            misc: { type: 'text' }
+        })
+
+        let container = createElement({
+            parent: frame,
+            className: 'calc-items',
+            children: [this.field]
+        })
+
+        const that = this;
+        Calculator.BUTTONS.forEach((button) => {
+            let btn = createElement({
+                parent: container,
+                type: 'button', innerHTML: button.toString(),
+                misc: { type: 'button', value: button }
+            })
+            if (button === 'C') btn.onclick = () => that.field.value = '';
+            else btn.onclick = () => that.field.value += btn.value;
+        })
+
+        let equals = createElement({
+            parent: container,
+            type: 'button', className: 'calc-equals', innerHTML: '=',
+            misc: { value: '=', onclick: () => this.compute(this.field) },
+        })
+    }
+
+    compute(field) {
+        field.value = field.value.trim();
+        try {
+            if (field.value) field.value = evalArithmetic(field.value);
+        } catch (e) {
+            field.value = e;
         }
-        let equals = document.createElement('button');
-        equals.value = '=';
-        equals.textContent = '=';
-        equals.className = 'calc-equals';
-        equals.onclick = () => {
-            field.value = field.value.trim();
-            try {
-                if (field.value) field.value = evalArithmetic(field.value);
-            } catch (e) {
-                field.value = e;
-            }
-        }
-        container.append(equals);
-        frame.append(container);
-        this.elem.append(frame);
     }
 }
 
 class InternetWanderer extends Window {
     generateContent() {
-        let frame = document.createElement('div');
-        frame.className = 'window-frame ie-frame';
-        frame.style.cursor = 'progress';
+        let frame = createElement({
+            parent: this.elem,
+            className: 'window-frame ie-frame',
+            style: { cursor: 'progress' },
+            innerHTML: `
+                <h1><i class='fa fa-internet-explorer'></i></h1>
+                <h3>
+                <div> Welcome to Wanderer!</div>
+                <div> This is the first-time setup process. </div>
+                <div> Press Next to continue. </div>
+                </h3>
+            `,
+            children: [createElement({
+                type: 'button',
+                innerHTML: 'next',
+                misc: { type: 'button', onclick: () => this.fail() }
+            })]
+        })
+    }
 
-        frame.innerHTML = `
-            <h1><i class='fa fa-internet-explorer'></i></h1>
-            <h3>
-            <div> Welcome to Wanderer!</div>
-            <div> This is the first-time setup process. </div>
-            <div> Press Next to continue. </div>
-            </h3>
-        `
-        let btn = document.createElement('button');
-        btn.innerHTML = 'Next';
-
-        frame.appendChild(btn);
-
-        btn.onclick = () => {
-            setTimeout(() =>
-                createAlert('Error', 'An error occurred while the setup process was being started. Wanderer failed to start.', 'error', () => {
-                    hideAlert();
-                    this.close();
-                }, "OK"),
-                1000
-            );
-        }
-
-        this.elem.append(frame);
+    fail() {
+        setTimeout(() =>
+            // title, msg...
+            createAlert('Error', 'An error occurred while the setup process was being started. Wanderer failed to start.',
+                'error', // Dialog mode
+                () => { // action callback
+                    hideAlert()
+                    this.close()
+                },
+                "OK" // button alias
+            ), 1000
+        );
     }
 }
 
 class Paint extends Window {
     generateContent() {
-        let frame = document.createElement('div');
-        frame.className = 'window-frame paint-frame';
-
-        let iframe = document.createElement('iframe');
-        iframe.src = 'https://jspaint.app';
-
-        iframe.style.width = '100%';
-        iframe.style.height = '100%';
-
-        frame.append(iframe);
-        this.elem.append(frame);
+        createElement({
+            parent: this.elem,
+            className: 'window-frame paint-frame',
+            children: [
+                createElement({
+                    type: 'iframe', style: { 'width': '100%', 'height': '100%' },
+                    misc: { src: 'https://jspaint.app' }
+                })
+            ]
+        });
     }
-
-}
-
-function randInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
 }
 
 function toggleMenu() {
@@ -431,11 +411,8 @@ function hideMenu() {
 
 function mouseMove(e) {
     if (app.draggedElement != null) {
-        if (!(app.lastMousePos.x && app.lastMousePos.y)) return;
-        let d = {
-            x: e.clientX - app.lastMousePos.x,
-            y: e.clientY - app.lastMousePos.y
-        }
+        if (!app.lastMousePos.x || !app.lastMousePos.y) return;
+        let d = { x: e.clientX - app.lastMousePos.x, y: e.clientY - app.lastMousePos.y };
 
         app.draggedElement.pos.x += d.x;
         app.draggedElement.pos.y += d.y;
@@ -443,123 +420,91 @@ function mouseMove(e) {
         app.draggedElement.update();
     }
 
-    app.lastMousePos = {
-        x: e.clientX,
-        y: e.clientY
-    }
+    app.lastMousePos = { x: e.clientX, y: e.clientY }
 }
 
 const APPS = {
     'Notepad': {
-        obj: Notepad,
-        width: 400,
-        height: 300,
         title: 'Notepad',
-        desktop: true,
-        icon: '<i class="fas fa-file-alt"></i>'
+        obj: Notepad, width: 400, height: 300,
+        desktop: true, icon: '<i class="fas fa-file-alt"></i>'
     },
     'Terminal': {
-        'obj': Terminal,
-        width: 500,
-        height: 300,
         title: 'Terminal',
-        desktop: true,
-        icon: '<i class="fas fa-terminal"></i>'
+        'obj': Terminal, width: 500, height: 300,
+        desktop: true, icon: '<i class="fas fa-terminal"></i>'
     },
     'Calculator': {
-        'obj': Calculator,
-        width: 300,
-        height: 400,
         title: 'Calculator',
-        desktop: true,
-        icon: '<i class="fas fa-calculator"></i>'
+        'obj': Calculator, width: 300, height: 400,
+        desktop: true, icon: '<i class="fas fa-calculator"></i>'
     },
     'Internet Wanderer': {
-        'obj': InternetWanderer,
-        width: 800,
-        height: 600,
         title: 'Internet Wanderer',
-        desktop: true,
-        icon: '<i class="fa fa-internet-explorer" aria-hidden="true"></i>'
+        'obj': InternetWanderer, width: 800, height: 600,
+        desktop: true, icon: '<i class="fa fa-internet-explorer" aria-hidden="true"></i>'
     },
     'Paint': {
-        'obj': Paint,
-        width: 800,
-        height: 600,
         title: 'Paint',
-        desktop: true,
-        icon: '<i class="fas fa-palette"></i>'
+        'obj': Paint, width: 800, height: 600,
+        desktop: true, icon: '<i class="fas fa-palette"></i>'
     },
     'About...': {
-        'obj': About,
-        width: 300,
-        height: 200,
         title: 'About',
-        desktop: true,
-        icon: '<i class="fas fa-info-circle"></i>'
+        'obj': About, width: 300, height: 200,
+        desktop: true, icon: '<i class="fas fa-info-circle"></i>'
     },
-}
-
-function createDesktopItem(icon, label) {
-    return `
-        <div class='desktop-icon'>${icon}</div>
-        <span class='desktop-label'>${label}</span>
-    `;
 }
 
 function populateItems(apps) {
+
+    const createDesktopItem = (icon, label) => `<div class='desktop-icon'>${icon}</div> <span class='desktop-label'>${label}</span>`;
     let menuList = document.querySelector("#menu-items");
     let desktop = document.querySelector("#desktop");
     menuList.innerHTML = '';
+
+    const setSelectedDitm = (ditm) => {
+        document.querySelectorAll('.desktop-item.selected').forEach((elem) => elem.classList.remove('selected'));
+        ditm.classList.add('selected');
+    }
+
     for (let key in apps) {
         const item = apps[key];
-        const elt = document.createElement('div');
-        elt.className = 'menu-item';
+        const icon = item.icon || '';
 
-        let icon = item.icon || '';
-
-        elt.innerHTML = `
-            ${icon}
-            <span>${key}</span>
-        `
         const launch = () => {
             hideMenu();
-            app.addWindow(item.obj, item.width, item.height, {
-                name: item.title
-            });
+            app.addWindow(item.obj, item.width, item.height, { name: item.title });
         }
 
-        elt.onclick = launch;
+        const elt = createElement({
+            parent: menuList,
+            className: 'menu-item', innerHTML: ` ${icon} <span>${key}</span> `,
+            misc: { onclick: launch }
+        })
 
         if (item.desktop) {
-            let ditm = document.createElement('div');
-            ditm.className = 'desktop-item';
-            ditm.innerHTML = createDesktopItem(item.icon, item.title);
-            ditm.ondblclick = launch;
-            ditm.onclick = function() {
-                document.querySelectorAll('.desktop-item.selected').forEach((elem) => elem.classList.remove('selected'));
-                this.classList.add('selected');
-            }
-            desktop.appendChild(ditm);
+            const ditm = createElement({
+                parent: desktop,
+                className: 'desktop-item', innerHTML: createDesktopItem(item.icon, item.title),
+                misc: { ondblclick: launch, onclick: () => setSelectedDitm(ditm) }
+            })
         }
-        menuList.appendChild(elt);
     }
 }
 
 function matchesList(el, selectorList) {
-    for (let x of selectorList) {
-        if (el.matches(x)) return true;
-    }
+    for (let x of selectorList) if (el.matches(x)) return true;
     return false;
 }
 
-window.addEventListener('click', function(e) {
+window.addEventListener('click', function (e) {
     let menu = document.querySelector("#menu");
     let openBtn = document.querySelector("#menu-open-btn");
-    if (e.target !== menu && !menu.contains(e.target) && e.target !== openBtn) {
-        hideMenu();
-    }
-    if (!matchesList(e.target, ['.desktop-item', '.desktop-icon', '.desktop-item.selected', '.desktop-label', '.desktop-icon > i'])) {
+    if (e.target !== menu && !menu.contains(e.target) && e.target !== openBtn) hideMenu();
+    if (!matchesList(e.target,
+        ['.desktop-item', '.desktop-icon', '.desktop-item.selected', '.desktop-label', '.desktop-icon > i']
+    )) {
         document.querySelectorAll('.desktop-item.selected').forEach((elem) => elem.classList.remove('selected'));
     }
 })
@@ -568,21 +513,20 @@ function init() {
     app = new App();
     document.querySelector("#menu-open-btn").onclick = toggleMenu;
     window.addEventListener('mousemove', mouseMove);
+
     populateItems(APPS);
 
-    let dateDiv = document.querySelector("#switcher-clock-date");
-    let timeDiv = document.querySelector("#switcher-clock-time");
+    const date = document.querySelector("#switcher-clock-date");
+    const time = document.querySelector("#switcher-clock-time");
 
-    function updateDate() {
+    function updateClock() {
         let cur = new Date();
-        dateDiv.innerHTML = cur.toLocaleDateString();
-        timeDiv.innerHTML = cur.toLocaleTimeString();
-        setTimeout(updateDate, 1000);
+        date.innerHTML = cur.toLocaleDateString();
+        time.innerHTML = cur.toLocaleTimeString();
+        setTimeout(updateClock, 1000);
     }
 
-    updateDate();
+    updateClock();
 }
 
-window.addEventListener('DOMContentLoaded', function() {
-    init();
-})
+window.addEventListener('DOMContentLoaded', () => init());
