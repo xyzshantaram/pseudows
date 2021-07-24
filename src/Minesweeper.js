@@ -21,14 +21,16 @@ class Minesweeper extends Window {
         this.board = new minesweeper.Board(minesweeper.generateMineArray({
             rows: 15,
             cols: 15,
-            mines: 30
+            mines: 40
         }));
+
+        this.moveCount = 0;
         this.render()
     }
 
     showAboutNotice() {
         createAlert('About',
-            `<h3>Mines v1.0</h3>
+            `<h3>Mines v1.1</h3>
             <div>Copyright © 2021 Siddharth Singh</div>
             <hr>
             <strong>Acknowledgements</strong>
@@ -53,9 +55,11 @@ class Minesweeper extends Window {
         const state = this.board._state;
         switch (state) {
             case minesweeper.BoardStateEnum.LOST:
+                let msg = 'You lost the game.'
+                if (this.moveCount == 1) msg = 'You lost, but looks like it was because your first click was a mine... Sorry about that!'
                 createAlert(
                     'You lost',
-                    'You lost the game.', 'error',
+                    msg, 'error',
                     () => {
                         this.close();
                         hideAlert();
@@ -66,7 +70,7 @@ class Minesweeper extends Window {
             case minesweeper.BoardStateEnum.WON:
                 createAlert(
                     'Congratulations!',
-                    'You won!', 'error',
+                    `You won the game in ${this.moveCount} moves! Nice!`, 'error',
                     () => {
                         this.close();
                         hideAlert();
@@ -125,8 +129,10 @@ class Minesweeper extends Window {
                 }
 
                 btn.onmousedown = (e) => {
+                    if (grid[y][x].state == CellStateEnum.OPEN) return;
                     if (e.button == 0) this.board.openCell(x, y);
                     else this.board.cycleCellFlag(x, y);
+                    this.moveCount += 1;
                     this.render();
                 }
             }
