@@ -1,3 +1,4 @@
+"use strict";
 function createElement(args) {
     let { parent, type, className, id, innerHTML, misc, children, style } = args;
     if (!type) type = 'div';
