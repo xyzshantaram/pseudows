@@ -52,7 +52,7 @@ class Browser extends Window {
 
     navigate(url) {
         if (url == '') {
-            this.iframe.src = '/src/frame.html';
+            this.iframe.src = './src/frame.html';
             return;
         }
         if (url.includes('google.com')) {
