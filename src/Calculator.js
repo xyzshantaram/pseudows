@@ -2,7 +2,7 @@ class Calculator extends Window {
     static BUTTONS = [1, 2, 3, '+', 4, 5, 6, '-', 7, 8, 9, '*', 'C', 0, '^', '/'];
     constructor(width, height, args) {
         super(width, height, args);
-        this.disableMaximize();
+        this.disableNthTitleButton(2);
     }
 
     toggleMaximized() { }

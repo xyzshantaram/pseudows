@@ -473,3 +473,9 @@ input[type='text'] {
     margin-left: 1rem;
     margin-right: 1rem;
 }
+
+@media only screen and (max-aspect-ratio: 1/1) {
+    :root {
+        --is-screen-too-narrow: 1;
+    }
+}

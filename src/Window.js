@@ -40,6 +40,11 @@ class Window {
         })
 
         this.elem.style.animation = 'grow 0.2s forwards';
+
+        if (getCSSCustomProp('--is-screen-too-narrow') === '1') {
+            this.toggleMaximized();
+            this.disableNthTitleButton(2);
+        }
     }
 
     update() {
@@ -145,10 +150,10 @@ class Window {
         this.update();
     }
 
-    disableMaximize() {
-        const maximize = this.titleBarButtons.querySelector(':nth-child(2)');
-        maximize.setAttribute('disabled', 'disabled');
-        Object.assign(maximize.style, {
+    disableNthTitleButton(n) {
+        const btn = this.titleBarButtons.querySelector(`:nth-child(${n})`);
+        btn.setAttribute('disabled', 'disabled');
+        Object.assign(btn.style, {
             pointerEvents: 'none',
             cursor: 'not-allowed'
         });
