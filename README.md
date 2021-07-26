@@ -11,7 +11,8 @@ override the `generateContent()` method.
 ### Acknowledgements
 
 [Minesweeper](https://github.com/binaryluke/Minesweeper) Copyright (c) 2015 Luke
-Howard
+Howard\
+Based on an idea by [@tinycoder2](https://github.com/tinyCoder2), which they realised in [pimbuOS](https://github.com/tinycoder2/pimbuOS)
 
 ---
 
